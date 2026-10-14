@@ -37,3 +37,7 @@ Bump `VERSION` in `sw.js` whenever any app file changes. Installed phones only f
 ## Hosting
 
 GitHub Pages, serving the repository root of `main`. All paths are relative, so it works at `https://<user>.github.io/<repo>/`.
+
+## License
+
+MIT, see [LICENSE](LICENSE). The fonts in `fonts/` are under the SIL Open Font License 1.1.

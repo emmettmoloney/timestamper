@@ -1,6 +1,7 @@
 {
   "name": "timestamper",
   "private": true,
+  "license": "MIT",
   "type": "module",
   "description": "PWA for logging movement times in the case time zone. No build step; this file only runs the tests.",
   "scripts": {
