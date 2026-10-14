@@ -1,0 +1,10 @@
+{
+  "name": "timestamper",
+  "private": true,
+  "type": "module",
+  "description": "PWA for logging movement times in the case time zone. No build step; this file only runs the tests.",
+  "scripts": {
+    "test": "node --test tests/",
+    "serve": "python3 -m http.server 8080"
+  }
+}
