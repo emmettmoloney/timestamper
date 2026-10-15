@@ -84,6 +84,9 @@ button:disabled { opacity: .4; cursor: default; }
 .label { font-size: 13px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-soft); }
 .field { width: 100%; background: var(--field); border: 2px solid var(--field-line); border-radius: 10px; padding: 14px; font-size: 19px; min-height: 58px; }
 textarea.field { resize: none; min-height: 76px; display: block; }
+/* iOS gives date/time inputs a native width that ignores width: 100% and overflows the row. */
+input[type="date"].field, input[type="time"].field { -webkit-appearance: none; appearance: none; display: block; min-width: 0; max-width: 100%; text-align: left; }
+input[type="date"].field::-webkit-date-and-time-value, input[type="time"].field::-webkit-date-and-time-value { text-align: left; }
 .select-wrap { position: relative; }
 .select-wrap select { appearance: none; -webkit-appearance: none; padding-right: 48px; font-weight: 600; }
 .select-wrap::after { content: ""; position: absolute; right: 20px; top: 50%; width: 11px; height: 11px; border-right: 3px solid currentColor; border-bottom: 3px solid currentColor; transform: translateY(-70%) rotate(45deg); pointer-events: none; }
@@ -139,6 +142,7 @@ textarea.field { resize: none; min-height: 76px; display: block; }
 /* Settings */
 .st { display: grid; gap: 22px; padding-block: 14px 28px; }
 .st h1 { font-size: 26px; margin: 0; }
+.st .version { font-size: 15px; color: var(--ink-soft); margin-top: -14px; }
 .st section { display: grid; gap: 10px; }
 .st h2 { margin: 0; }
 .st p { margin: 0; }
@@ -155,6 +159,7 @@ textarea.field { resize: none; min-height: 76px; display: block; }
 .ops .field { min-height: 48px; font-size: 17px; padding: 8px 10px; }
 .ops .btn { min-width: 44px; padding-inline: 8px; }
 .addrow { display: grid; grid-template-columns: 1fr auto; gap: 8px; }
+[data-act="op-reset"] { margin-top: 12px; }
 .warn { border: 2px solid var(--ink); border-radius: 10px; padding: 12px 14px; font-size: 16px; }
 .warn strong { display: block; margin-bottom: 4px; }
 .fine { font-size: 14px; color: var(--ink-soft); }
@@ -169,6 +174,7 @@ nav.tabs svg { width: 26px; height: 26px; }
 .scrim { position: fixed; inset: 0; background: var(--scrim); display: flex; align-items: flex-end; justify-content: center; z-index: 30; }
 .sheet { width: 100%; max-width: 460px; background: var(--bg); color: var(--ink); border: 2px solid var(--line); border-bottom: 0; border-radius: 18px 18px 0 0; padding-block: 20px calc(20px + env(safe-area-inset-bottom, 0px)); display: grid; gap: 14px; max-height: 92%; overflow-y: auto; }
 .sheet h2 { margin: 0; font-size: 22px; text-wrap: balance; }
+.sheet h2:focus { outline: none; }
 .sheet .row { display: flex; gap: 10px; flex-wrap: wrap; }
 .sheet .row > * { flex: 1; min-width: 120px; }
 .sheet p { margin: 0; overflow-wrap: anywhere; }

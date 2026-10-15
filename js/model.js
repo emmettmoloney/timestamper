@@ -116,7 +116,7 @@ export function logText(c) {
       const what = [e.op, e.note].filter(Boolean).join(' · ');
       const flags = [
         e.edited ? `edited; saved ${dateStr(e.orig, c.tz) === g.day ? '' : dateStr(e.orig, c.tz) + ' '}${hhmm(e.orig, c.tz)}` : '',
-        e.late ? 'late entry' : '',
+        e.late ? 'added entry' : '',
       ].filter(Boolean);
       lines.push(`${hhmm(e.t, c.tz)} ${abbr(e.t, c.tz)}  ${what}${flags.length ? `  (${flags.join('; ')})` : ''}`);
     }
@@ -143,3 +143,4 @@ export function moveOp(s, i, dir) {
   [s.ops[i], s.ops[j]] = [s.ops[j], s.ops[i]];
 }
 export const removeOp = (s, i) => { s.ops.splice(i, 1); };
+export const resetOps = s => { s.ops = [...DEFAULT_OPS]; };

@@ -36,7 +36,7 @@ The location the movement starts from and the location it ends at.
 The first and second airports used in a Case, in the order they are reached.
 
 **Late Entry**:
-An Entry added afterwards from the review page with a hand-entered Timestamp; marked like an Edited Entry because it was not captured live.
+An Entry added afterwards from the review page with a hand-entered Timestamp; marked like an Edited Entry because it was not captured live. Labelled "Added" in the app.
 
 **Past Case**:
 Any Case that is no longer the Active Case; still viewable, editable, and deletable.

@@ -101,7 +101,7 @@ test('copied log has the zone, UTC offset, day headings and marks', () => {
     '',
     '14 Oct 2026',
     '14:05 MDT  Depart Sending · Unit 4  (edited; saved 14:07)',
-    '15:07 MDT  Fuel stop  (late entry)',
+    '15:07 MDT  Fuel stop  (added entry)',
     '',
     '15 Oct 2026',
     '00:07 MDT  Arrive Receiving',
@@ -129,4 +129,15 @@ test('operation list edits', () => {
   assert.deepEqual(s.ops.slice(0, 2), ['Depart Airport 1', 'Arrive Airport 1']);
   M.removeOp(s, 0);
   assert.equal(s.ops[0], 'Arrive Airport 1');
+});
+
+test('restoring default operations replaces the edited list', () => {
+  const s = M.newState();
+  M.addOp(s, 'Fuel');
+  M.renameOp(s, 0, 'Wheels up');
+  M.removeOp(s, 1);
+  M.resetOps(s);
+  assert.deepEqual(s.ops, M.DEFAULT_OPS);
+  s.ops.push('Fuel');
+  assert.equal(M.DEFAULT_OPS.includes('Fuel'), false);
 });

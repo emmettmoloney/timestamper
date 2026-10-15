@@ -2,7 +2,7 @@
 // Bump VERSION whenever any file below changes so phones pick up the update.
 // An open page keeps the code it loaded; the new version shows on the next launch.
 
-const VERSION = 'v1';
+const VERSION = 'v2';
 const CACHE = `timestamper-${VERSION}`;
 const FILES = [
   './', 'index.html', 'styles.css', 'manifest.webmanifest',

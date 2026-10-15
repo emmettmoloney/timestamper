@@ -22,7 +22,7 @@ const ICON = {
 // ---------- State ----------
 const S = load();
 // UI-only state, never stored.
-const U = { screen: 'log', reviewTab: 'case', reviewId: S.activeId, draftOp: '', draftNote: '', error: '', sheet: null, storage: 'unknown' };
+const U = { screen: 'log', reviewTab: 'case', reviewId: S.activeId, draftOp: '', draftNote: '', error: '', sheet: null, storage: 'unknown', version: '' };
 let installEvent = null;
 
 function commit() {
@@ -34,7 +34,7 @@ const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;'
 const sameOffset = (t, a, b) => offsetMs(t, a) === offsetMs(t, b);
 const clockTz = () => M.activeCase(S)?.tz || phoneZone();
 const reviewCase = () => M.caseById(S, U.reviewId) || M.activeCase(S) || S.cases[0] || null;
-const marks = e => (e.edited ? ' <span class="badge">Edited</span>' : '') + (e.late ? ' <span class="badge">Late</span>' : '');
+const marks = e => (e.edited ? ' <span class="badge">Edited</span>' : '') + (e.late ? ' <span class="badge">Added</span>' : '');
 const isStandalone = () => matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
 const isIOS = () => /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 const ago = ms => { const m = Math.round(ms / 60000), h = Math.floor(m / 60); return h ? `${h} h ${m % 60} min` : `${m} min`; };
@@ -102,9 +102,9 @@ function reviewScreen() {
     <div class="rv-head"><h1>${esc(M.caseName(c))}</h1><div class="meta">
       ${c.id === S.activeId ? '<span class="badge">Active</span>' : ''}<span>Started ${dateStr(st, c.tz)}</span>
       <button class="tzchip" data-act="edit-tz" aria-label="Change case time zone">${abbr(st, c.tz)} · ${esc(zoneName(c.tz))} ✎</button>
-      <button class="btn link small" data-act="rename">Rename</button></div></div>
+      <button class="tzchip" data-act="rename" aria-label="Rename case">Rename ✎</button></div></div>
     ${timeline}
-    <div class="actions"><button class="btn small" data-act="copy" ${c.entries.length ? '' : 'disabled'}>Copy log</button><button class="btn small" data-act="late">Add late entry</button><button class="btn small danger" data-act="del-case">Delete case</button></div></div>`;
+    <div class="actions"><button class="btn small" data-act="copy" ${c.entries.length ? '' : 'disabled'}>Copy Log</button><button class="btn small" data-act="late">Add Entry</button><button class="btn small danger" data-act="del-case">Delete Case</button></div></div>`;
 }
 
 function settingsScreen() {
@@ -113,6 +113,7 @@ function settingsScreen() {
     : `<span class="sw" style="background:${p.sw[0][0]};color:${p.sw[0][1]}">14:07</span>`;
   const storage = { granted: 'Protected: the browser has agreed not to clear it.', denied: 'Not guaranteed yet. Installing to the home screen protects it.', unsupported: 'Not guaranteed. Installing to the home screen protects it.', unknown: 'Checking…' }[U.storage];
   return `<div class="st gutter"><h1>Settings</h1>
+  <p class="version">Version <span class="mono">${esc(U.version || 'not installed')}</span></p>
   ${paletteNotice()}
   <section><h2 class="label">Appearance</h2><ul class="pal">${PALETTES.map(p => `<li><button data-act="palette" data-v="${p.key}" aria-pressed="${S.palette === p.key}">
     ${swatch(p)}<span><span class="nm">${p.name}</span><span class="ds">${p.desc}</span></span></button></li>`).join('')}</ul></section>
@@ -121,7 +122,8 @@ function settingsScreen() {
       <button class="btn small" data-act="op-up" data-v="${i}" aria-label="Move ${esc(o)} up" ${i === 0 ? 'disabled' : ''}>↑</button>
       <button class="btn small" data-act="op-down" data-v="${i}" aria-label="Move ${esc(o)} down" ${i === S.ops.length - 1 ? 'disabled' : ''}>↓</button>
       <button class="btn small danger" data-act="op-del" data-v="${i}" aria-label="Remove ${esc(o)}">✕</button></li>`).join('')}</ul>
-    <div class="addrow"><input class="field" id="new-op" placeholder="New operation" aria-label="New operation" enterkeyhint="done"><button class="btn primary" data-act="op-add">Add</button></div></section>
+    <div class="addrow"><input class="field" id="new-op" placeholder="New operation" aria-label="New operation" enterkeyhint="done"><button class="btn primary" data-act="op-add">Add</button></div>
+    <button class="btn small" data-act="op-reset">Restore default operations</button></section>
   <section><h2 class="label">Privacy</h2><div class="warn"><strong>Times and events only.</strong>Don't enter patient names or other identifying details. Entries stay on this phone and in anything you copy them into.</div></section>
   <section><h2 class="label">This phone</h2>
     <p>Your log is stored only on this phone, in this browser. ${storage}</p>
@@ -148,12 +150,12 @@ function sheetHtml() {
     const c = M.caseById(S, o.caseId), e = o.entryId ? c.entries.find(x => x.id === o.entryId) : null;
     const t = e ? e.t : Date.now(), p = parts(t, c.tz);
     const ops = e && e.op && !S.ops.includes(e.op) ? [e.op, ...S.ops] : S.ops;
-    body = `<h2 id="sheet-title">${e ? 'Edit entry' : 'Add late entry'}</h2>
+    body = `<h2 id="sheet-title" tabindex="-1">${e ? 'Edit entry' : 'Add Entry'}</h2>
       <div class="row"><div><label class="label" for="ov-date">Date</label><input class="field" type="date" id="ov-date" value="${p.y}-${pad(p.mo)}-${pad(p.d)}"></div>
       <div><label class="label" for="ov-time">Time (${abbr(t, c.tz)})</label><input class="field mono" type="time" id="ov-time" value="${pad(p.h)}:${pad(p.mi)}"></div></div>
       <div><label class="label" for="ov-op">Operation</label><div class="select-wrap"><select class="field" id="ov-op"><option value="">None</option>${ops.map(x => `<option ${e && e.op === x ? 'selected' : ''}>${esc(x)}</option>`).join('')}</select></div></div>
       <div><label class="label" for="ov-note">Note</label><textarea class="field" id="ov-note" placeholder="Times &amp; events only, no patient identifiers">${esc(e ? e.note : '')}</textarea></div>
-      <p class="fine">${e ? `Originally saved <span class="mono">${hhmm(e.orig, c.tz)}</span> ${abbr(e.orig, c.tz)}, ${dateStr(e.orig, c.tz)}${e.edited ? ' · edited since' : ''}` : `Times are in the case time zone, ${esc(zoneName(c.tz))}. Late entries are marked.`}</p>
+      <p class="fine">${e ? `Originally saved <span class="mono">${hhmm(e.orig, c.tz)}</span> ${abbr(e.orig, c.tz)}, ${dateStr(e.orig, c.tz)}${e.edited ? ' · edited since' : ''}` : `Times are in the case time zone, ${esc(zoneName(c.tz))}. Added entries are marked.`}</p>
       <p class="err" id="ov-err" role="alert"></p>
       <div class="row">${e ? '<button class="btn danger" data-act="del-entry">Delete</button>' : ''}<button class="btn" data-act="close">Cancel</button><button class="btn primary" data-act="entry-save">${e ? 'Save changes' : 'Add entry'}</button></div>`;
   } else if (o.kind === 'tz') {
@@ -180,7 +182,9 @@ function sheetHtml() {
 function openSheet(o) {
   U.sheet = o;
   render();
-  app.querySelector('.sheet input, .sheet select, .sheet textarea, .sheet button')?.focus({ preventScroll: true });
+  // The entry sheet focuses its heading: focusing the date field opens the phone's date picker.
+  if (o.kind === 'entry') document.getElementById('sheet-title').focus({ preventScroll: true });
+  else app.querySelector('.sheet input, .sheet select, .sheet textarea, .sheet button')?.focus({ preventScroll: true });
 }
 function closeSheet() { U.sheet = null; render(); }
 
@@ -320,6 +324,10 @@ const actions = {
     confirmSheet(`Remove “${S.ops[+v]}”?`, 'Entries already saved keep this operation. It only leaves the dropdown.', 'Remove',
       () => { M.removeOp(S, +v); commit(); render(); });
   },
+  'op-reset'() {
+    confirmSheet('Restore default operations?', 'The list goes back to the original operations. Operations you added or renamed leave the dropdown; entries already saved keep them.', 'Restore',
+      () => { M.resetOps(S); commit(); render(); toast('Default operations restored'); });
+  },
   'op-add'() {
     const input = document.getElementById('new-op');
     if (M.addOp(S, input.value)) { commit(); render(); document.getElementById('new-op')?.focus(); }
@@ -358,7 +366,19 @@ addEventListener('appinstalled', () => { installEvent = null; render(); });
 
 if ('serviceWorker' in navigator && location.protocol !== 'file:') {
   navigator.serviceWorker.register('sw.js').catch(() => { /* offline support unavailable */ });
+  navigator.serviceWorker.addEventListener('controllerchange', readVersion);
 }
+
+// The installed version is the suffix of the offline cache name (VERSION in sw.js).
+function readVersion() {
+  if (!self.caches) return;
+  caches.keys().then(keys => {
+    const k = keys.find(x => x.startsWith('timestamper-'));
+    U.version = k ? k.slice('timestamper-'.length) : '';
+    if (U.screen === 'settings' && !U.sheet) render();
+  }).catch(() => {});
+}
+readVersion();
 
 applyPalette();
 render();

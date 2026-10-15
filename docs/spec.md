@@ -9,7 +9,7 @@ Agreed decisions as of 14 Oct 2026. Terms follow [CONTEXT.md](../CONTEXT.md). Pr
 - A Case starts on the first Save with no Active Case, using the phone's current zone. New Case closes it (with confirmation).
 - Stale Case: Save after 4 hours with no Entry asks "Start a new case?" first.
 - An Entry needs an Operation, a Note, or both. Fields clear after Save; toast "Saved 14:07 MDT".
-- Edits keep the Original Timestamp and mark the Entry as edited. Late Entries can be added to any Case and are marked.
+- Edits keep the Original Timestamp and mark the Entry as edited. Late Entries can be added to any Case and are marked "Added".
 - Entries and Cases can be deleted, always with an in-app confirmation. Nothing is ever deleted automatically.
 - Case Time Zone can be corrected on the Review page; Cases can be renamed (optional).
 - Copy log button: plain text of the Case Log, including the UTC offset. No reminder prompts.
@@ -30,9 +30,10 @@ Agreed decisions as of 14 Oct 2026. Terms follow [CONTEXT.md](../CONTEXT.md). Pr
   - Then the **Save is the clock** button (variant B): a large button showing the live time in the Case Time Zone, the zone, "phone shows …" when the phone's zone differs, and "Tap to save".
 - **Review**
   - Top: "This case" / "All cases" segmented control (variant C). Past Cases appear only under "All cases".
-  - "This case": case header, then the vertical timeline (variant B), then Copy log, Add late entry and Delete case. Tap an Entry to edit or delete it.
+  - "This case": case header, then the vertical timeline (variant B), then Copy log, Add Entry (a Late Entry) and Delete case. Tap an Entry to edit or delete it; the edit sheet opens with no field focused, so the date picker stays closed until tapped.
 - **Settings**
-  - Appearance picker, then the Operation list: add, rename, reorder (↑/↓) and remove.
+  - Installed version (from the offline cache name, set by `VERSION` in `sw.js`) under the heading.
+  - Appearance picker, then the Operation list: add, rename, reorder (↑/↓), remove, and restore the default list.
   - Default Operations: Arrive Airport 1, Depart Airport 1, Arrive Airport 2, Depart Airport 2, Arrive Sending, Depart Sending, Arrive Receiving, Handoff.
   - Privacy warning.
 
